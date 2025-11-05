@@ -76,7 +76,7 @@ type UnnormalisedInput = Tensor Real [15]
 minimumInputValues : UnnormalisedInput
 minimumInputValues = [
   -10.0,   -- x position [m]
-   0.0,    -- z (altitude) [m]
+  0.0,    -- z (altitude) [m]
   -pi,     -- theta, pitch angle [rad]
   -10.0,     -- x velocity [m/s]
   -10.0,    -- z velocity [m/s]
