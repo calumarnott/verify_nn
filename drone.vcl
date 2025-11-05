@@ -7,30 +7,30 @@ pi = 3.141592
 --------------------------------------------------------------------------------
 -- Inputs
 
--- We first define a new name for the type of inputs of the network.
--- In particular, it takes inputs of the form of a tensor of 15 real numbers:
--- 10 states and 5 reference errors 
+-- Inputs are a tensor of 15 reals. Each one representing a different
+-- physical quantity describing the state of the drone and its payload.
 
 type Input = Tensor Real [15]
+-- Normalised input vector (each element scaled to the [-1, 1] or [0, 1] range)
+-- This is what the neural network 'drone' actually receives.
 
--- Next we add meaningful names for the indices
--- TODO: confirm this is the correct index labels for each variable
+-- The index mapping corresponds to the underlying physical quantities:
+x         = 0 -- normalised x position (was metres)
+z         = 1 -- normalised altitude (was metres)
+theta     = 2 -- normalised pitch angle (was radians)
+x_dot     = 3 -- normalised x velocity (was m/s)
+z_dot     = 4 -- normalised z velocity (was m/s)
+theta_dot = 5 -- normalised pitch rate (was rad/s)
+l         = 6 -- normalised cable length (was metres)
+phi       = 7 -- normalised payload swing angle (was radians)
+l_dot     = 8 -- normalised cable rate (was m/s)
+phi_dot   = 9 -- normalised swing rate (was rad/s)
+err_x     = 10 -- normalised x position error (was metres)
+err_z     = 11 -- normalised z position error (was metres)
+err_theta = 12 -- normalised pitch error (was radians)
+err_phi   = 13 -- normalised swing angle error (was radians)
+err_l     = 14 -- normalised cable length error (was metres)
 
-x = 0 -- measured in metres
-z = 1 -- measured in metres
-theta = 2 -- measured in radians
-x_dot = 3 -- measured in metres/second
-z_dot = 4 -- measured in metres/second
-theta_dot = 5 -- measured in radians/second
-l = 6 -- measured in metres
-phi = 7 -- measured in radians
-l_dot = 8 -- measured in metres/second
-phi_dot = 9 -- measured in radians/second
-err_x = 10 -- measured in metres
-err_z = 11 -- measured in metres
-err_theta = 12 -- measured in radians
-err_phi = 13 -- measured in radians
-err_l = 14 -- measured in metres
 
 --------------------------------------------------------------------------------
 -- Outputs
@@ -41,7 +41,7 @@ err_l = 14 -- measured in metres
 type Output = Tensor Real [5]
 
 -- Again we define meaningful names for the indices into output vectors.
--- TODO: also confirm this is correct
+-- TODO: confirm these are still the outputs
 
 u_x = 0
 u_z = 1
@@ -57,7 +57,7 @@ u_l = 4
 -- via a reference to the ONNX file at compile time.
 
 @network
-drone : Input -> Output
+droneNN : Input -> Output
 
 --------------------------------------------------------------------------------
 --Normalisation 
@@ -72,43 +72,193 @@ type UnnormalisedInput = Tensor Real [15]
 
 -- Minimum and maximum problem-space values for each input dimension.
 -- These define the input domain of the neural network.
--- BELOW ARE JUST PLACEHOLDERS.. NOT OUR ACTUAL STATES
 
 minimumInputValues : UnnormalisedInput
 minimumInputValues = [
   -10.0,   -- x position [m]
    0.0,    -- z (altitude) [m]
-  -pi,     -- roll φ [ra
-  -pi,     -- pitch θ [rad]
-  -pi,     -- yaw ψ [rad]
-  -10.0,   -- x velocity [m/s]
-  -10.0,   -- z velocity [m/s]
-  -20.0,   -- roll rate [rad/s]
-  -20.0,   -- pitch rate [rad/s]
-  -20.0,   -- yaw rate [rad/s]
-  -2.0,    -- payload swing angle [rad]
-  -5.0,    -- payload angular rate [rad/s]
-   0.0,    -- cable length [m]
+  -pi,     -- theta, pitch angle [rad]
+  -10.0,     -- x velocity [m/s]
+  -10.0,    -- z velocity [m/s]
+  -20.0,   -- theta rate [rad/s]
+  0.0,   -- cable length [m]
+  -pi,     -- phi, payload swing angle [rad]
   -1.0,    -- cable rate [m/s]
-  -1.0     -- control bias or residual term
+  -20.0,   -- phi rate [rad/s]
+  -20.0,   -- x position error [m]
+  -10.0,   -- z position error [m]
+  -pi,    -- theta angle error [rad]
+  -pi,    -- phi angle error [rad]
+  -2.0    -- cable length error [m]
 ]
 
 maximumInputValues : UnnormalisedInput
 maximumInputValues = [
-   10.0,   -- x position
-   10.0,   -- z altitude
-    pi,    -- roll
-    pi,    -- pitch
-    pi,    -- yaw
-   10.0,   -- x velocity
-   10.0,   -- z velocity
-   20.0,   -- roll rate
-   20.0,   -- pitch rate
-   20.0,   -- yaw rate
-    2.0,   -- payload swing
-    5.0,   -- payload angular rate
-   2.0,    -- cable length
-    1.0,   -- cable rate
-    1.0    -- control bias
+  10.0,   -- x position [m]
+  10.0,    -- z (altitude) [m]
+  pi,     -- theta, pitch angle [rad]
+  10.0,     -- x velocity [m/s]
+  10.0,    -- z velocity [m/s]
+  20.0,   -- theta rate [rad/s]
+  2.0,   -- cable length [m]
+  pi,     -- phi, payload swing angle [rad]
+  1.0,    -- cable rate [m/s]
+  20.0,   -- phi rate [rad/s]
+  20.0,   -- x position error [m]
+  10.0,   -- z position error [m]
+  pi,    -- theta angle error [rad]
+  pi,    -- phi angle error [rad]
+  2.0    -- cable length error [m]
 ]
- 
+
+-- A function that checks whether a given unnormalised input is valid
+validInput : UnnormalisedInput -> Bool
+validInput x = forall i . minimumInputValues ! i <= x ! i <= maximumInputValues ! i
+
+-- A function that computes the scaling values for normalisation.
+meanScalingValues : UnnormalisedInput
+meanScalingValues = foreach i . (maximumInputValues ! i + minimumInputValues ! i) / 2
+
+-- A function that normalises a given unnormalised input
+normalise : UnnormalisedInput -> Input
+normalise x = foreach i .
+  (x ! i - meanScalingValues ! i) /
+  (maximumInputValues ! i - minimumInputValues ! i)
+
+-- Apply the trained neural network (defined elsewhere)
+normDroneNN : UnnormalisedInput -> Output
+normDroneNN x = droneNN (normalise x)
+
+-- Define predicate: network advises output i for input x
+advises : Index 5 -> UnnormalisedInput -> Bool
+advises i x = forall j . i != j => normDroneNN x ! i < normDroneNN x ! j
+
+--------------------------------------------------------------------------------
+-- Properties
+--------------------------------------------------------------------------------
+
+-- Property 1: For all valid unnormalised inputs, each network output
+--             must lie within the defined physical limits.
+
+-- Define per-output lower and upper bounds in the problem space.
+-- These correspond to actuator or command limits for your system.
+
+minimumOutputValues : Output
+minimumOutputValues = [
+  -10.0,   -- u_x: lateral thrust or force [N] (example)
+  -10.0,   -- u_z: vertical thrust or force [N]
+   -5.0,   -- u_theta: pitch torque [N·m]
+  -10.0,   -- u_phi: payload swing control [N]
+    0.0    -- u_l: winch or cable control [N or m/s]
+]
+
+maximumOutputValues : Output
+maximumOutputValues = [
+   10.0,   -- u_x
+   10.0,   -- u_z
+    5.0,   -- u_theta
+   10.0,   -- u_phi
+    0.0    -- u_l (no negative cable extension)
+]
+
+-- Helper predicate: an output vector is within the valid range.
+validOutput : Output -> Bool
+validOutput y = forall i . minimumOutputValues ! i <= y ! i <= maximumOutputValues ! i
+
+-- Property 1 statement:
+-- For all valid unnormalised inputs x, the network's normalised output
+-- (mapped back to output space) must be within bounds.
+@property
+property1 :
+  forall (x : UnnormalisedInput) .
+    validInput x =>
+      validOutput (normDroneNN x)
+
+--------------------------------------------------------------------------------
+-- Property 2: Monotonicity in altitude error (err_z)
+
+-- Increasing altitude error should not decrease commanded vertical thrust.
+
+@property
+property2 :
+  forall (x1 : UnnormalisedInput) (x2 : UnnormalisedInput) .
+    -- Both inputs must be valid
+    validInput x1 /\ validInput x2 /\
+
+    -- All inputs are equal except for err_z
+    (forall i . i != err_z => x1 ! i = x2 ! i) /\
+
+    -- The second input has a larger altitude error
+    (x2 ! err_z > x1 ! err_z)
+  =>
+    -- Then the vertical output (u_z) should not decrease
+    normDroneNN x2 ! u_z >= normDroneNN x1 ! u_z
+
+--------------------------------------------------------------------------------
+-- Property 3: Lipschitz / Smoothness constraint
+
+-- Small perturbations in the input should not cause large output changes.
+
+-- We define a Lipschitz constant K and a maximum perturbation delta.
+K = 2.0           -- Lipschitz bound: output change ≤ 2 × input change
+delta = 0.1       -- Small input perturbation magnitude
+
+@property
+property3 :
+  forall (x1 : UnnormalisedInput) (x2 : UnnormalisedInput) .
+    -- Both inputs are valid
+    validInput x1 /\ validInput x2 /\
+
+    -- The inputs are close in all dimensions (L∞ norm ≤ delta)
+    (forall i . abs (x1 ! i - x2 ! i) <= delta)
+  =>
+    -- Then the outputs must be close (L∞ norm ≤ K × delta)
+    (forall j . abs (normDroneNN x1 ! j - normDroneNN x2 ! j) <= K * delta)
+
+--------------------------------------------------------------------------------
+-- Property 4: Symmetry / Sign Consistency
+
+-- Mirroring horizontal position error (err_x) should mirror horizontal thrust (u_x).
+
+@property
+property4 :
+  forall (x : UnnormalisedInput) .
+    validInput x =>
+      let
+        -- Define a mirrored copy of the input where err_x is negated.
+        x_mirror = foreach i .
+          if i == err_x
+            then -x ! i
+          else x ! i
+      in
+        -- The horizontal thrust output should flip sign:
+        normDroneNN x_mirror ! u_x = - normDroneNN x ! u_x
+        /\
+        -- All other outputs remain the same:
+        (forall j . j != u_x => normDroneNN x_mirror ! j = normDroneNN x ! j)
+
+--------------------------------------------------------------------------------
+-- Property 5: Equilibrium / Stability Condition
+
+-- When all state errors and rates are zero, the network should output ≈ 0.
+
+tolerance = 0.05  -- acceptable small deviation from zero
+
+@property
+property5 :
+  forall (x : UnnormalisedInput) .
+    -- The equilibrium condition: zero errors and rates
+    (x ! err_x = 0.0) /\
+    (x ! err_z = 0.0) /\
+    (x ! err_theta = 0.0) /\
+    (x ! err_phi = 0.0) /\
+    (x ! err_l = 0.0) /\
+    (x ! x_dot = 0.0) /\
+    (x ! z_dot = 0.0) /\
+    (x ! theta_dot = 0.0) /\
+    (x ! phi_dot = 0.0) /\
+    (x ! l_dot = 0.0)
+  =>
+    -- Then all control outputs should be near zero
+    (forall j .
+        abs (normDroneNN x ! j) <= tolerance)
