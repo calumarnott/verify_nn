@@ -75,39 +75,39 @@ type UnnormalisedInput = Tensor Real [15]
 
 minimumInputValues : UnnormalisedInput
 minimumInputValues = [
-  -10.0,   -- x position [m]
-  0.0,    -- z (altitude) [m]
-  -pi,     -- theta, pitch angle [rad]
-  -10.0,     -- x velocity [m/s]
-  -10.0,    -- z velocity [m/s]
-  -20.0,   -- theta rate [rad/s]
-  0.0,   -- cable length [m]
-  -pi,     -- phi, payload swing angle [rad]
-  -1.0,    -- cable rate [m/s]
-  -20.0,   -- phi rate [rad/s]
-  -20.0,   -- x position error [m]
-  -10.0,   -- z position error [m]
-  -pi,    -- theta angle error [rad]
-  -pi,    -- phi angle error [rad]
+  -10.0;   -- x position [m]
+  0.0;    -- z (altitude) [m]
+  -pi;     -- theta, pitch angle [rad]
+  -10.0;     -- x velocity [m/s]
+  -10.0;    -- z velocity [m/s]
+  -20.0;   -- theta rate [rad/s]
+  0.0;   -- cable length [m]
+  -pi;     -- phi, payload swing angle [rad]
+  -1.0;    -- cable rate [m/s]
+  -20.0;   -- phi rate [rad/s]
+  -20.0;   -- x position error [m]
+  -10.0;   -- z position error [m]
+  -pi;    -- theta angle error [rad]
+  -pi;    -- phi angle error [rad]
   -2.0    -- cable length error [m]
 ]
 
 maximumInputValues : UnnormalisedInput
 maximumInputValues = [
-  10.0,   -- x position [m]
-  10.0,    -- z (altitude) [m]
-  pi,     -- theta, pitch angle [rad]
-  10.0,     -- x velocity [m/s]
-  10.0,    -- z velocity [m/s]
-  20.0,   -- theta rate [rad/s]
-  2.0,   -- cable length [m]
-  pi,     -- phi, payload swing angle [rad]
-  1.0,    -- cable rate [m/s]
-  20.0,   -- phi rate [rad/s]
-  20.0,   -- x position error [m]
-  10.0,   -- z position error [m]
-  pi,    -- theta angle error [rad]
-  pi,    -- phi angle error [rad]
+  10.0;   -- x position [m]
+  10.0;    -- z (altitude) [m]
+  pi;     -- theta, pitch angle [rad]
+  10.0;     -- x velocity [m/s]
+  10.0;    -- z velocity [m/s]
+  20.0;   -- theta rate [rad/s]
+  2.0;   -- cable length [m]
+  pi;     -- phi, payload swing angle [rad]
+  1.0;    -- cable rate [m/s]
+  20.0;   -- phi rate [rad/s]
+  20.0;   -- x position error [m]
+  10.0;   -- z position error [m]
+  pi;    -- theta angle error [rad]
+  pi;    -- phi angle error [rad]
   2.0    -- cable length error [m]
 ]
 
@@ -145,19 +145,19 @@ advises i x = forall j . i != j => normDroneNN x ! i < normDroneNN x ! j
 
 minimumOutputValues : Output
 minimumOutputValues = [
-  -10.0,   -- u_x: lateral thrust or force [N] (example)
-  -10.0,   -- u_z: vertical thrust or force [N]
-   -5.0,   -- u_theta: pitch torque [N·m]
-  -10.0,   -- u_phi: payload swing control [N]
+  -10.0;   -- u_x: lateral thrust or force [N] (example)
+  -10.0;   -- u_z: vertical thrust or force [N]
+   -5.0;   -- u_theta: pitch torque [N·m]
+  -10.0;   -- u_phi: payload swing control [N]
     0.0    -- u_l: winch or cable control [N or m/s]
 ]
 
 maximumOutputValues : Output
 maximumOutputValues = [
-   10.0,   -- u_x
-   10.0,   -- u_z
-    5.0,   -- u_theta
-   10.0,   -- u_phi
+   10.0;   -- u_x
+   10.0;   -- u_z
+    5.0;   -- u_theta
+   10.0;   -- u_phi
     0.0    -- u_l (no negative cable extension)
 ]
 
