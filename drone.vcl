@@ -75,69 +75,39 @@ type UnnormalisedInput = Tensor Real [15]
 
 minimumInputValues : UnnormalisedInput
 minimumInputValues = [
-  -- x position [m]
   -10.0;  
-  -- z (altitude) [m]
   0.0;  
-  -- theta, pitch angle [rad]  
   -pi;  
-  -- x velocity [m/s]   
   -10.0; 
-  -- z velocity [m/s]    
   -10.0;  
-  -- theta rate [rad/s]  
   -20.0; 
-  -- cable length [m]  
   0.0;   
-  -- phi, payload swing angle [rad]
   -pi;   
-  -- cable rate [m/s]  
   -1.0;  
-  -- phi rate [rad/s]  
   -20.0; 
-  -- x position error [m]  
   -20.0; 
-  -- z position error [m]  
   -10.0;  
-  -- theta angle error [rad] 
   -pi;   
-  -- phi angle error [rad] 
   -pi;   
-  -- cable length error [m] 
   -2.0    
 ]
 
 maximumInputValues : UnnormalisedInput
 maximumInputValues = [
-  -- x position [m]
   10.0;
-  -- z (altitude) [m]
   10.0;
-  -- theta, pitch angle [rad]
   pi;
-  -- x velocity [m/s]
   10.0;
-  -- z velocity [m/s]
   10.0;
-  -- theta rate [rad/s]
   20.0;
-  -- cable length [m]
   2.0;
-  -- phi, payload swing angle [rad]
   pi;
-  -- cable rate [m/s]
   1.0;
-  -- phi rate [rad/s]
   20.0;
-  -- x position error [m]
   20.0;
-  -- z position error [m]
   10.0;
-  -- theta angle error [rad]
   pi;
-  -- phi angle error [rad]
   pi;
-  -- cable length error [m]
   2.0
 ]
 
