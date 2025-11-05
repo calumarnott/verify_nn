@@ -75,41 +75,72 @@ type UnnormalisedInput = Tensor Real [15]
 
 minimumInputValues : UnnormalisedInput
 minimumInputValues = [
-  -10.0;   -- x position [m]
-  0.0;    -- z (altitude) [m]
-  -pi;     -- theta, pitch angle [rad]
-  -10.0;     -- x velocity [m/s]
-  -10.0;    -- z velocity [m/s]
-  -20.0;   -- theta rate [rad/s]
-  0.0;   -- cable length [m]
-  -pi;     -- phi, payload swing angle [rad]
-  -1.0;    -- cable rate [m/s]
-  -20.0;   -- phi rate [rad/s]
-  -20.0;   -- x position error [m]
-  -10.0;   -- z position error [m]
-  -pi;    -- theta angle error [rad]
-  -pi;    -- phi angle error [rad]
-  -2.0    -- cable length error [m]
+  -- x position [m]
+  -10.0;  
+  -- z (altitude) [m]
+  0.0;  
+  -- theta, pitch angle [rad]  
+  -pi;  
+  -- x velocity [m/s]   
+  -10.0; 
+  -- z velocity [m/s]    
+  -10.0;  
+  -- theta rate [rad/s]  
+  -20.0; 
+  -- cable length [m]  
+  0.0;   
+  -- phi, payload swing angle [rad]
+  -pi;   
+  -- cable rate [m/s]  
+  -1.0;  
+  -- phi rate [rad/s]  
+  -20.0; 
+  -- x position error [m]  
+  -20.0; 
+  -- z position error [m]  
+  -10.0;  
+  -- theta angle error [rad] 
+  -pi;   
+  -- phi angle error [rad] 
+  -pi;   
+  -- cable length error [m] 
+  -2.0    
 ]
 
 maximumInputValues : UnnormalisedInput
 maximumInputValues = [
-  10.0;   -- x position [m]
-  10.0;    -- z (altitude) [m]
-  pi;     -- theta, pitch angle [rad]
-  10.0;     -- x velocity [m/s]
-  10.0;    -- z velocity [m/s]
-  20.0;   -- theta rate [rad/s]
-  2.0;   -- cable length [m]
-  pi;     -- phi, payload swing angle [rad]
-  1.0;    -- cable rate [m/s]
-  20.0;   -- phi rate [rad/s]
-  20.0;   -- x position error [m]
-  10.0;   -- z position error [m]
-  pi;    -- theta angle error [rad]
-  pi;    -- phi angle error [rad]
-  2.0    -- cable length error [m]
+  -- x position [m]
+  10.0;
+  -- z (altitude) [m]
+  10.0;
+  -- theta, pitch angle [rad]
+  pi;
+  -- x velocity [m/s]
+  10.0;
+  -- z velocity [m/s]
+  10.0;
+  -- theta rate [rad/s]
+  20.0;
+  -- cable length [m]
+  2.0;
+  -- phi, payload swing angle [rad]
+  pi;
+  -- cable rate [m/s]
+  1.0;
+  -- phi rate [rad/s]
+  20.0;
+  -- x position error [m]
+  20.0;
+  -- z position error [m]
+  10.0;
+  -- theta angle error [rad]
+  pi;
+  -- phi angle error [rad]
+  pi;
+  -- cable length error [m]
+  2.0
 ]
+
 
 -- A function that checks whether a given unnormalised input is valid
 validInput : UnnormalisedInput -> Bool
@@ -145,20 +176,20 @@ advises i x = forall j . i != j => normDroneNN x ! i < normDroneNN x ! j
 
 minimumOutputValues : Output
 minimumOutputValues = [
-  -10.0;   -- u_x: lateral thrust or force [N] (example)
-  -10.0;   -- u_z: vertical thrust or force [N]
-   -5.0;   -- u_theta: pitch torque [N·m]
-  -10.0;   -- u_phi: payload swing control [N]
-    0.0    -- u_l: winch or cable control [N or m/s]
+  -10.0;   
+  -10.0;   
+   -5.0;   
+  -10.0;   
+    0.0    
 ]
 
 maximumOutputValues : Output
 maximumOutputValues = [
-   10.0;   -- u_x
-   10.0;   -- u_z
-    5.0;   -- u_theta
-   10.0;   -- u_phi
-    0.0    -- u_l (no negative cable extension)
+   10.0;   
+   10.0;  
+    5.0;   
+   10.0;   
+    0.0    
 ]
 
 -- Helper predicate: an output vector is within the valid range.
