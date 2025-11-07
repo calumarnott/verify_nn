@@ -75,39 +75,39 @@ type UnnormalisedInput = Tensor Real [15]
 
 minimumInputValues : UnnormalisedInput
 minimumInputValues = [
-  -10.0;  
-  0.0;  
-  -pi;  
-  -10.0; 
-  -10.0;  
-  -20.0; 
-  0.0;   
-  -pi;   
-  -1.0;  
-  -20.0; 
-  -20.0; 
-  -10.0;  
-  -pi;   
-  -pi;   
-  -2.0    
+  -10.0,
+  0.0,
+  -pi,
+  -10.0,
+  -10.0,
+  -20.0,
+  0.0,
+  -pi,
+  -1.0,
+  -20.0,
+  -20.0,
+  -10.0,
+  -pi,
+  -pi,
+  -2.0
 ]
 
 maximumInputValues : UnnormalisedInput
 maximumInputValues = [
-  10.0;
-  10.0;
-  pi;
-  10.0;
-  10.0;
-  20.0;
-  2.0;
-  pi;
-  1.0;
-  20.0;
-  20.0;
-  10.0;
-  pi;
-  pi;
+  10.0,
+  10.0,
+  pi,
+  10.0,
+  10.0,
+  20.0,
+  2.0,
+  pi,
+  1.0,
+  20.0,
+  20.0,
+  10.0,
+  pi,
+  pi,
   2.0
 ]
 
@@ -146,20 +146,20 @@ advises i x = forall j . i != j => normDroneNN x ! i < normDroneNN x ! j
 
 minimumOutputValues : Output
 minimumOutputValues = [
-  -10.0;   
-  -10.0;   
-   -5.0;   
-  -10.0;   
-    0.0    
+  -10.0,
+  -10.0,
+   -5.0,
+  -10.0,
+    0.0
 ]
 
 maximumOutputValues : Output
 maximumOutputValues = [
-   10.0;   
-   10.0;  
-    5.0;   
-   10.0;   
-    0.0    
+   10.0,
+   10.0,
+    5.0,
+   10.0,
+    0.0
 ]
 
 -- Helper predicate: an output vector is within the valid range.
