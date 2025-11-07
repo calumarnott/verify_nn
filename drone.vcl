@@ -31,7 +31,6 @@ err_theta = 12 -- normalised pitch error (was radians)
 err_phi   = 13 -- normalised swing angle error (was radians)
 err_l     = 14 -- normalised cable length error (was metres)
 
-
 --------------------------------------------------------------------------------
 -- Outputs
 
@@ -106,8 +105,7 @@ maximumInputValues = [
   10.0,
   pi,
   pi,
-  2.0]
-
+  2.0 ]
 
 -- A function that checks whether a given unnormalised input is valid
 validInput : UnnormalisedInput -> Bool
@@ -155,7 +153,7 @@ maximumOutputValues = [
    10.0,
     5.0,
    10.0,
-    0.0]
+    0.0 ]
 
 -- Helper predicate: an output vector is within the valid range.
 validOutput : Output -> Bool
@@ -171,91 +169,90 @@ property1 =
     validInput x =>
       validOutput (normDroneNN x)
 
--- --------------------------------------------------------------------------------
--- -- Property 2: Monotonicity in altitude error (err_z)
+--------------------------------------------------------------------------------
+-- Property 2: Monotonicity in altitude error (err_z)
 
--- -- Increasing altitude error should not decrease commanded vertical thrust.
+-- Increasing altitude error should not decrease commanded vertical thrust.
 
--- @property
--- property2 :
---   forall (x1 : UnnormalisedInput) (x2 : UnnormalisedInput) .
---     -- Both inputs must be valid
---     validInput x1 /\ validInput x2 /\
+@property
+property2 :
+  forall (x1 : UnnormalisedInput) (x2 : UnnormalisedInput) .
+    -- Both inputs must be valid
+    validInput x1 /\ validInput x2 /\
 
---     -- All inputs are equal except for err_z
---     (forall i . i != err_z => x1 ! i = x2 ! i) /\
+    -- All inputs are equal except for err_z
+    (forall i . i != err_z => x1 ! i = x2 ! i) /\
 
---     -- The second input has a larger altitude error
---     (x2 ! err_z > x1 ! err_z)
---   =>
---     -- Then the vertical output (u_z) should not decrease
---     normDroneNN x2 ! u_z >= normDroneNN x1 ! u_z
+    -- The second input has a larger altitude error
+    (x2 ! err_z > x1 ! err_z)
+  =>
+    -- Then the vertical output (u_z) should not decrease
+    normDroneNN x2 ! u_z >= normDroneNN x1 ! u_z
 
--- --------------------------------------------------------------------------------
--- -- Property 3: Lipschitz / Smoothness constraint
+--------------------------------------------------------------------------------
+-- Property 3: Lipschitz / Smoothness constraint
 
--- -- Small perturbations in the input should not cause large output changes.
+-- Small perturbations in the input should not cause large output changes.
 
--- -- We define a Lipschitz constant K and a maximum perturbation delta.
--- K = 2.0           -- Lipschitz bound: output change ≤ 2 × input change
--- delta = 0.1       -- Small input perturbation magnitude
+-- We define a Lipschitz constant K and a maximum perturbation delta.
+K = 2.0           -- Lipschitz bound: output change ≤ 2 × input change
+delta = 0.1       -- Small input perturbation magnitude
 
--- @property
--- property3 :
---   forall (x1 : UnnormalisedInput) (x2 : UnnormalisedInput) .
---     -- Both inputs are valid
---     validInput x1 /\ validInput x2 /\
+@property
+property3 :
+  forall (x1 : UnnormalisedInput) (x2 : UnnormalisedInput) .
+    -- Both inputs are valid
+    validInput x1 /\ validInput x2 /\
 
---     -- The inputs are close in all dimensions (L∞ norm ≤ delta)
---     (forall i . abs (x1 ! i - x2 ! i) <= delta)
---   =>
---     -- Then the outputs must be close (L∞ norm ≤ K × delta)
---     (forall j . abs (normDroneNN x1 ! j - normDroneNN x2 ! j) <= K * delta)
+    -- The inputs are close in all dimensions (L∞ norm ≤ delta)
+    (forall i . abs (x1 ! i - x2 ! i) <= delta)
+  =>
+    -- Then the outputs must be close (L∞ norm ≤ K × delta)
+    (forall j . abs (normDroneNN x1 ! j - normDroneNN x2 ! j) <= K * delta)
 
--- --------------------------------------------------------------------------------
--- -- Property 4: Symmetry / Sign Consistency
+--------------------------------------------------------------------------------
+-- Property 4: Symmetry / Sign Consistency
 
--- -- Mirroring horizontal position error (err_x) should mirror horizontal thrust (u_x).
+-- Mirroring horizontal position error (err_x) should mirror horizontal thrust (u_x).
 
--- @property
--- property4 :
---   forall (x : UnnormalisedInput) .
---     validInput x =>
---       let
---         -- Define a mirrored copy of the input where err_x is negated.
---         x_mirror = foreach i .
---           if i == err_x
---             then -x ! i
---           else x ! i
---       in
---         -- The horizontal thrust output should flip sign:
---         normDroneNN x_mirror ! u_x = - normDroneNN x ! u_x
---         /\
---         -- All other outputs remain the same:
---         (forall j . j != u_x => normDroneNN x_mirror ! j = normDroneNN x ! j)
+@property
+property4 :
+  forall (x : UnnormalisedInput) .
+    validInput x =>
+      let
+        -- Define a mirrored copy of the input where err_x is negated.
+        x_mirror = foreach i .
+          if i == err_x
+            then -x ! i
+          else x ! i
+      in
+        -- The horizontal thrust output should flip sign:
+        normDroneNN x_mirror ! u_x = - normDroneNN x ! u_x
+        /\
+        -- All other outputs remain the same:
+        (forall j . j != u_x => normDroneNN x_mirror ! j = normDroneNN x ! j)
 
--- --------------------------------------------------------------------------------
--- -- Property 5: Equilibrium / Stability Condition
+--------------------------------------------------------------------------------
+-- Property 5: Equilibrium / Stability Condition
 
--- -- When all state errors and rates are zero, the network should output ≈ 0.
+-- When all state errors and rates are zero, the network should output ≈ 0.
 
--- tolerance = 0.05  -- acceptable small deviation from zero
+tolerance = 0.05  -- acceptable small deviation from zero
 
--- @property
--- property5 :
---   forall (x : UnnormalisedInput) .
---     -- The equilibrium condition: zero errors and rates
---     (x ! err_x = 0.0) /\
---     (x ! err_z = 0.0) /\
---     (x ! err_theta = 0.0) /\
---     (x ! err_phi = 0.0) /\
---     (x ! err_l = 0.0) /\
---     (x ! x_dot = 0.0) /\
---     (x ! z_dot = 0.0) /\
---     (x ! theta_dot = 0.0) /\
---     (x ! phi_dot = 0.0) /\
---     (x ! l_dot = 0.0)
---   =>
---     -- Then all control outputs should be near zero
---     (forall j .
---         abs (normDroneNN x ! j) <= tolerance)
+@property
+property5 : Bool 
+property5 =
+  forall x .
+    (x ! err_x = 0.0) /\
+    (x ! err_z = 0.0) /\
+    (x ! err_theta = 0.0) /\
+    (x ! err_phi = 0.0) /\
+    (x ! err_l = 0.0) /\
+    (x ! x_dot = 0.0) /\
+    (x ! z_dot = 0.0) /\
+    (x ! theta_dot = 0.0) /\
+    (x ! phi_dot = 0.0) /\
+    (x ! l_dot = 0.0)
+  =>
+    (forall j .
+        abs (normDroneNN x ! j) <= tolerance)
