@@ -1,3 +1,5 @@
+#!/bin/bash
+
  vehicle verify \
   --specification drone.vcl \
   --verifier Marabou \
