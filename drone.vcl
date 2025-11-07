@@ -165,8 +165,9 @@ validOutput y = forall i . minimumOutputValues ! i <= y ! i <= maximumOutputValu
 -- For all valid unnormalised inputs x, the network's normalised output
 -- (mapped back to output space) must be within bounds.
 @property
-property1 :
-  forall (x : UnnormalisedInput) .
+property1 : Bool
+property1 =
+  forall x .
     validInput x =>
       validOutput (normDroneNN x)
 
