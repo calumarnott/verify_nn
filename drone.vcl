@@ -106,8 +106,7 @@ maximumInputValues = [
   10.0,
   pi,
   pi,
-  2.0
-]
+  2.0]
 
 
 -- A function that checks whether a given unnormalised input is valid
@@ -148,8 +147,7 @@ minimumOutputValues = [
   -10.0,
    -5.0,
   -10.0,
-    0.0
-]
+    0.0 ]
 
 maximumOutputValues : Output
 maximumOutputValues = [
@@ -157,8 +155,7 @@ maximumOutputValues = [
    10.0,
     5.0,
    10.0,
-    0.0
-]
+    0.0]
 
 -- Helper predicate: an output vector is within the valid range.
 validOutput : Output -> Bool
