@@ -4,6 +4,10 @@
 -- The value of the constant `pi`.
 pi = 3.141592
 
+-- Absolute value function
+abs : Real -> Real
+abs x = if x >= 0.0 then x else -x
+
 --------------------------------------------------------------------------------
 -- Inputs
 
