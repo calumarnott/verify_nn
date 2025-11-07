@@ -15,7 +15,7 @@ type Input = Tensor Real [15]
 -- This is what the neural network 'drone' actually receives.
 
 -- The index mapping corresponds to the underlying physical quantities:
-x         = 0 -- normalised x position (was metres)
+x_p       = 0 -- normalised x position (was metres)
 z         = 1 -- normalised altitude (was metres)
 theta     = 2 -- normalised pitch angle (was radians)
 x_dot     = 3 -- normalised x velocity (was m/s)
