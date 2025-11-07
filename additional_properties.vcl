@@ -1,3 +1,6 @@
+-- HERE ARE SOME ADDITIONAL PROPERTIES WE MAY WISH TO CONSIDER FOR THE DRONE CONTROLLER NEURAL NETWORK.
+-- I HAVE NOT TESTED THEM YET AND THEY ARE LIKELY VERY BUGGY
+
 -- --------------------------------------------------------------------------------
 -- -- Property X: Monotonicity in altitude error (err_z)
 
