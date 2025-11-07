@@ -243,15 +243,15 @@ tolerance = 0.05  -- acceptable small deviation from zero
 property5 : Bool 
 property5 =
   forall x .
-    (x ! err_x = 0.0) and
-    (x ! err_z = 0.0) and
-    (x ! err_theta = 0.0) and
-    (x ! err_phi = 0.0) and
-    (x ! err_l = 0.0) and
-    (x ! x_dot = 0.0) and
-    (x ! z_dot = 0.0) and
-    (x ! theta_dot = 0.0) and
-    (x ! phi_dot = 0.0) and
+    (x ! err_x = 0.0) /\
+    (x ! err_z = 0.0) /\
+    (x ! err_theta = 0.0) /\
+    (x ! err_phi = 0.0) /\
+    (x ! err_l = 0.0) /\
+    (x ! x_dot = 0.0) /\
+    (x ! z_dot = 0.0) /\
+    (x ! theta_dot = 0.0) /\
+    (x ! phi_dot = 0.0) /\
     (x ! l_dot = 0.0)
   =>
     (forall j .
