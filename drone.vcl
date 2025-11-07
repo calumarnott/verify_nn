@@ -63,8 +63,7 @@ droneNN : Input -> Output
 --Normalisation 
 
 -- The neural network operates over normalised inputs.
--- These must be scaled versions of the physical quantities
--- (position, angle, velocity, etc.) defined in real-world units.
+-- These must be scaled versions of the physical quantities (position, angle, velocity, etc.) defined in real-world units.
 -- The following section defines the normalisation procedure
 -- so that verification can be done in the problem-space domain.
 
@@ -89,8 +88,7 @@ minimumInputValues = [
   -10.0,
   -pi,
   -pi,
-  -2.0
-]
+  -2.0 ]
 
 maximumInputValues : UnnormalisedInput
 maximumInputValues = [
