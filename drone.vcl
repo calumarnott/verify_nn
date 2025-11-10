@@ -182,8 +182,29 @@ tolerance = 0.05  -- acceptable small deviation from zero
 
 @property
 property2 : Bool 
-property5 =
+property2 =
   forall (x : UnnormalisedInput) .
     validInput x =>
       (let zero_state = x ! err_x == 0.0 and x ! err_z == 0.0 and x ! err_theta == 0.0 and x ! err_phi == 0.0 and x ! err_l == 0.0 and x ! x_dot == 0.0 and x ! z_dot == 0.0 and x ! theta_dot == 0.0 and x ! phi_dot == 0.0 and x ! l_dot == 0.0
        in zero_state => (forall (j : Index 5) . abs (normDroneNN x ! j) <= tolerance))
+
+--------------------------------------------------------------------------------
+-- Property 3: Lipschitz / Smoothness constraint
+
+-- Small perturbations in the input should not cause large output changes.
+
+-- We define a Lipschitz constant K and a maximum perturbation delta.
+K = 2.0           -- Lipschitz bound: output change ≤ 2 × input change
+delta = 0.1       -- Small input perturbation magnitude
+
+@property
+property3 : Bool
+property3 =
+  forall (x1 : UnnormalisedInput) (x2 : UnnormalisedInput) .
+    validInput x1 and validInput x2 and
+
+    -- The inputs are close in all dimensions (L_inf norm ≤ delta)
+    (forall i . abs (x1 ! i - x2 ! i) <= delta)
+  =>
+    -- Then the outputs must be close (L_inf norm ≤ K × delta)
+    (forall j . abs (normDroneNN x1 ! j - normDroneNN x2 ! j) <= K * delta)
